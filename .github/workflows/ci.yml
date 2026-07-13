@@ -10,15 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: sre-bench
-      - uses: actions/checkout@v4
-        with:
-          repository: nandinikansal/trajeval
-          path: trajeval
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -r sre-bench/requirements.txt
-      - run: cd sre-bench && python -m pytest -q
-      - run: cd sre-bench && docker compose config -q
+      - run: pip install -r requirements.txt
+      - run: python -m pytest -q
+      - run: docker compose config -q
