@@ -17,7 +17,7 @@ import argparse
 import pathlib
 import time
 
-from trajeval import Leaderboard, save_jsonl
+from trajeval import Leaderboard, load_jsonl, save_jsonl
 
 from bench.goldens import GOLDEN_SCRIPTS, healthy_state
 from bench.probes import probe_environment
@@ -30,10 +30,16 @@ from harness.tools import TOOLS, ToolExecutor
 REPO_ROOT = pathlib.Path(__file__).resolve().parent
 
 
-def run_real(models, scenarios, seeds, max_steps, out_dir):
+def run_real(models, scenarios, seeds, max_steps, out_dir, prior=()):
     executor = ToolExecutor()
     trajectories, scores = [], []
     board = Leaderboard()
+    for t in prior:  # regrade prior runs so old and new share one board
+        if t.scenario in RUBRICS:
+            s = RUBRICS[t.scenario].grade(t)
+            trajectories.append(t)
+            scores.append(s)
+            board.add(s)
     out = REPO_ROOT / out_dir
     out.mkdir(exist_ok=True)
     failures = []
@@ -112,6 +118,11 @@ def main(argv=None) -> int:
     p.add_argument("--max-steps", type=int, default=12)
     p.add_argument("--out", default="runs")
     p.add_argument("--smoke", action="store_true", help="pipeline check: no docker, no API keys")
+    p.add_argument(
+        "--append",
+        action="store_true",
+        help="fold existing <out>/trajectories.jsonl runs into the board instead of starting fresh",
+    )
     args = p.parse_args(argv)
 
     if args.smoke:
@@ -119,8 +130,13 @@ def main(argv=None) -> int:
     else:
         if not args.models:
             p.error("--models required (or use --smoke)")
+        prior = []
+        prior_path = REPO_ROOT / args.out / "trajectories.jsonl"
+        if args.append and prior_path.exists():
+            prior = load_jsonl(str(prior_path))
+            print(f"appending to {len(prior)} prior runs from {prior_path}")
         trajectories, scores, board = run_real(
-            args.models, args.scenarios, args.seeds, args.max_steps, args.out
+            args.models, args.scenarios, args.seeds, args.max_steps, args.out, prior=prior
         )
 
     out = REPO_ROOT / args.out

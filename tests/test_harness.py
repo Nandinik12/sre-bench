@@ -305,6 +305,34 @@ def test_post_json_does_not_retry_bad_request(monkeypatch):
     assert attempts[0] == 1
 
 
+def test_append_folds_prior_runs_into_board(tmp_path):
+    from trajeval import Step, Trajectory, save_jsonl
+
+    import run_bench
+    from bench.goldens import GOLDEN_SCRIPTS, healthy_state
+
+    # prior run from an "old" model
+    script, answer = GOLDEN_SCRIPTS["dead-dependency"]
+    prior = Trajectory(
+        scenario="dead-dependency",
+        model="old-model",
+        steps=[Step(tool, args, result="ok") for tool, args in script],
+        final_answer=answer,
+        final_state=healthy_state(),
+    )
+    out = tmp_path / "runs"
+    out.mkdir()
+    save_jsonl([prior], str(out / "trajectories.jsonl"))
+
+    _, scores, board = run_bench.run_real(
+        models=[], scenarios=[], seeds=0, max_steps=1, out_dir=str(out),
+        prior=[prior],
+    )
+    rows = board.rows()
+    assert [r["model"] for r in rows] == ["old-model"]
+    assert rows[0]["overall"] == 1.0
+
+
 def test_smoke_pipeline_produces_full_leaderboard(tmp_path):
     import run_bench
 
