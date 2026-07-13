@@ -1,0 +1,4 @@
+# host-side tooling (chaos injector, probes, rubrics)
+trajeval @ file:../trajeval
+pyyaml>=6
+pytest>=7

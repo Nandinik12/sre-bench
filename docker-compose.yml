@@ -1,0 +1,52 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: sre-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  payments:
+    build: ./services/payments
+    container_name: sre-payments
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - BROKEN=${PAYMENTS_BROKEN:-0}
+    depends_on:
+      - redis
+    ports:
+      - "8082:8000"
+
+  inventory:
+    build: ./services/inventory
+    container_name: sre-inventory
+    volumes:
+      - ./services/inventory/config:/config
+    tmpfs:
+      - /data:size=32m
+    ports:
+      - "8083:8000"
+
+  orders:
+    build: ./services/orders
+    container_name: sre-orders
+    environment:
+      - PAYMENTS_URL=http://payments:8000
+      - INVENTORY_URL=http://inventory:8000
+    depends_on:
+      - payments
+      - inventory
+    ports:
+      - "8081:8000"
+
+  gateway:
+    build: ./services/gateway
+    container_name: sre-gateway
+    environment:
+      - ORDERS_URL=http://orders:8000
+    depends_on:
+      - orders
+    ports:
+      - "8080:8000"

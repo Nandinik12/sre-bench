@@ -1,0 +1,2 @@
+max_reserve: 100
+reserve_timeout_ms: 2000
