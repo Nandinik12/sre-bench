@@ -4,29 +4,10 @@ These tests are the contract that keeps the benchmark discriminative:
 if a rubric change lets a sloppy trajectory score well, they fail.
 """
 
-import copy
-
 from trajeval import Step, Trajectory
 
+from bench.goldens import healthy_state
 from bench.rubrics import RUBRICS
-
-HEALTHY_STATE = {
-    "services": {
-        "gateway": {"healthy": True},
-        "orders": {"healthy": True},
-        "payments": {"healthy": True},
-        "inventory": {"healthy": True},
-    },
-    "checkout_works": True,
-    "redis": {"running": True},
-    "payments_version": "v2.1.6",
-    "disk": {"inventory_data_pct": 12},
-    "config": {"inventory_valid": True},
-}
-
-
-def healthy_state():
-    return copy.deepcopy(HEALTHY_STATE)
 
 
 def traj(scenario, steps, answer, state=None):
