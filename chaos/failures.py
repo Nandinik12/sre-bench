@@ -65,7 +65,7 @@ FAILURE_MODES: Dict[str, FailureMode] = {
                 [
                     "docker", "compose", "exec", "-T", "inventory",
                     "sh", "-c",
-                    "dd if=/dev/zero of=/data/core.20260712.dump bs=1M count=31 2>/dev/null || true",
+                    "dd if=/dev/zero of=/data/core.20260712.dump bs=1M count=64 2>/dev/null || true",
                 ],
             )
         ],

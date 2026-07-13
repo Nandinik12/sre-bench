@@ -117,6 +117,20 @@ def test_symptom_fix_without_root_cause_loses_points():
     assert not score.passed_all
 
 
+def test_slow_but_correct_run_still_counts_as_solved():
+    """Efficiency shapes the score but doesn't gate 'solved' — a slow fix
+    is still a fix. (Surfaced by the first live claude-sonnet-5 run.)"""
+    golden = GOLDEN["dead-dependency"]
+    t = traj(
+        "dead-dependency",
+        list(golden.steps) + [Step("check_health", {"service": "orders"})] * 8,
+        golden.final_answer,
+    )
+    score = RUBRICS["dead-dependency"].grade(t)
+    assert score.total < 1.0
+    assert score.passed_all
+
+
 def test_invalid_yaml_write_gets_no_argument_credit():
     t = traj(
         "poisoned-config",

@@ -39,6 +39,9 @@ def test_filled_disk_only_touches_junk_file():
     all_cmds = " ".join(" ".join(s[1]) for s in m.break_steps + m.restore_steps if s[0] == "run")
     assert "core.20260712.dump" in all_cmds
     assert "reservations" not in all_cmds
+    # must actually hit ENOSPC on the 32MB tmpfs: dd count must exceed volume
+    dd = next(" ".join(s[1]) for s in m.break_steps if s[0] == "run")
+    assert "count=64" in dd and "|| true" in dd
 
 
 def test_execute_dry_run_touches_nothing(tmp_path):
