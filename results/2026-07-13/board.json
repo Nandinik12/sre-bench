@@ -1,0 +1,4038 @@
+{
+  "models": [
+    "claude-haiku-4-5-20251001",
+    "claude-sonnet-5"
+  ],
+  "scenarios": [
+    "bad-deploy",
+    "compound-outage",
+    "dead-dependency",
+    "filled-disk",
+    "poisoned-config",
+    "runaway-retry"
+  ],
+  "rows": [
+    {
+      "model": "claude-sonnet-5",
+      "overall": 0.9437880257449631,
+      "solved": 6,
+      "scenarios": 6,
+      "runs": 18,
+      "tool_selection": 0.9722222222222222,
+      "arguments": 1.0,
+      "end_state": 1.0,
+      "efficiency": 0.48537351881005136,
+      "output": 1.0
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "overall": 0.9094653127571107,
+      "solved": 4,
+      "scenarios": 6,
+      "runs": 18,
+      "tool_selection": 0.9425925925925926,
+      "arguments": 0.9444444444444444,
+      "end_state": 0.9444444444444444,
+      "efficiency": 0.5656912338763025,
+      "output": 1.0
+    }
+  ],
+  "scores": [
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-sonnet-5",
+      "total": 0.9651988636363636,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.7215909090909091,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.625,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "11 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8181818181818181,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-sonnet-5",
+      "total": 0.971875,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.775,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "10 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-sonnet-5",
+      "total": 0.971875,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.775,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "10 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.984375,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.875,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": false,
+          "detail": "8 steps (budget 8)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.890625,
+      "by_category": {
+        "tool_selection": 0.8,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.625,
+        "output": 1.0
+      },
+      "passed_all": false,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": true,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "12 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "3 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "bad-deploy",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9352678571428571,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.48214285714285715,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "args:set_deploy",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:payments_version",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "payments_version = 'v2.1.6' (want 'v2.1.6')"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "14 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7142857142857143,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/deploy|rollback|roll back|version/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-sonnet-5",
+      "total": 0.9674019607843137,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.6740196078431373,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.5833333333333334,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "17 steps (budget 12, limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7647058823529411,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-sonnet-5",
+      "total": 0.9775,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.775,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "15 steps (budget 12, limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "3 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-sonnet-5",
+      "total": 0.9482142857142858,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.48214285714285715,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 4x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "21 steps (budget 12, limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7142857142857143,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "6 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9346014492753623,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.3460144927536232,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.08333333333333333,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "23 steps (budget 12, limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.6086956521739131,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "9 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9638888888888889,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.6388888888888888,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "18 steps (budget 12, limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7777777777777778,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "compound-outage",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.93,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.3,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:12",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "25 steps (hard limit 24)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.6,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "10 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-sonnet-5",
+      "total": 0.9607843137254901,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.6666666666666667,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "12 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8333333333333334,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-sonnet-5",
+      "total": 0.9289215686274509,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.39583333333333337,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.125,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "15 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.6666666666666667,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "5 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-sonnet-5",
+      "total": 0.9256965944272446,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.368421052631579,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 7x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "19 steps (hard limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.736842105263158,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "5 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9861111111111112,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.8819444444444444,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.875,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "9 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8888888888888888,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "1 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9672459893048128,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.7215909090909091,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.625,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "11 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8181818181818181,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "dead-dependency",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9794117647058823,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.825,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:get_logs>restart_service",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:restart_service",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:redis.running",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "redis.running = True (want True)"
+        },
+        {
+          "name": "state:services.payments.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.payments.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.75,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "10 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.9,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "1 redundant call(s)"
+        },
+        {
+          "name": "answer:~/redis/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-sonnet-5",
+      "total": 0.9411764705882353,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.0,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "25 steps (hard limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-sonnet-5",
+      "total": 0.9485294117647058,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.125,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.125,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "15 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-sonnet-5",
+      "total": 0.9411764705882353,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.0,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "22 steps (hard limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9705882352941176,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.5,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "12 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9705882352941176,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.5,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "12 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "filled-disk",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9632352941176471,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.375,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:disk_usage",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:disk_usage>delete_file",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:delete_file(core dump)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "args:kept_reservations_log",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:disk_below_80pct",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.375,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "13 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "answer:~/disk|storage|full/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-sonnet-5",
+      "total": 0.9313725490196079,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.38235294117647056,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "17 steps (hard limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7647058823529411,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-sonnet-5",
+      "total": 0.9384920634920635,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.4464285714285714,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "14 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.6428571428571428,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "5 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-sonnet-5",
+      "total": 0.9236111111111112,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.3125,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "16 steps (hard limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.625,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "6 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9424603174603176,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.48214285714285715,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "14 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7142857142857143,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9741161616161617,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.7670454545454546,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.625,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "11 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.9090909090909091,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "1 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "poisoned-config",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9365740740740741,
+      "by_category": {
+        "tool_selection": 1.0,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.4291666666666667,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:read_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 1x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(valid yaml)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.inventory_valid",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.inventory_valid = True (want True)"
+        },
+        {
+          "name": "state:services.inventory.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.inventory.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.125,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "15 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7333333333333334,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "4 redundant call(s)"
+        },
+        {
+          "name": "answer:~/config/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-sonnet-5",
+      "total": 0.9064625850340136,
+      "by_category": {
+        "tool_selection": 0.8333333333333334,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.5178571428571428,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = True (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.orders.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "14 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.7857142857142857,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "3 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-sonnet-5",
+      "total": 0.9152930402930404,
+      "by_category": {
+        "tool_selection": 0.8333333333333334,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.6105769230769231,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = True (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.orders.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.375,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "13 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8461538461538461,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-sonnet-5",
+      "total": 0.9246031746031746,
+      "by_category": {
+        "tool_selection": 0.8333333333333334,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.7083333333333333,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 2x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = True (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.orders.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.5,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "12 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.9166666666666666,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "1 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.8958333333333334,
+      "by_category": {
+        "tool_selection": 0.8333333333333334,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.40625,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = True (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.orders.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "16 steps (hard limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8125,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "3 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.2355889724310777,
+      "by_category": {
+        "tool_selection": 0.5,
+        "arguments": 0.0,
+        "end_state": 0.0,
+        "efficiency": 0.4736842105263158,
+        "output": 1.0
+      },
+      "passed_all": false,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 5x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 2,
+          "passed": false,
+          "gating": true,
+          "detail": "matched 1/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 0.0,
+          "weight": 3,
+          "passed": false,
+          "gating": true,
+          "detail": "write_config never called"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 2x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 0.0,
+          "weight": 2,
+          "passed": false,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = False (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 0.0,
+          "weight": 2,
+          "passed": false,
+          "gating": true,
+          "detail": "not satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 0.0,
+          "weight": 2,
+          "passed": false,
+          "gating": true,
+          "detail": "services.orders.healthy = False (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 0.0,
+          "weight": 3,
+          "passed": false,
+          "gating": true,
+          "detail": "checkout_works = False (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "19 steps (hard limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.9473684210526316,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "1 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    },
+    {
+      "scenario": "runaway-retry",
+      "model": "claude-haiku-4-5-20251001",
+      "total": 0.9098639455782314,
+      "by_category": {
+        "tool_selection": 0.8333333333333334,
+        "arguments": 1.0,
+        "end_state": 1.0,
+        "efficiency": 0.5535714285714286,
+        "output": 1.0
+      },
+      "passed_all": true,
+      "checks": [
+        {
+          "name": "used:get_logs",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "called 3x (need >= 1)"
+        },
+        {
+          "name": "order:read_config>write_config",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "matched 2/2 in order"
+        },
+        {
+          "name": "args:write_config(bounded retry_limit)",
+          "category": "arguments",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        },
+        {
+          "name": "not_used:restart_service",
+          "category": "tool_selection",
+          "score": 0.0,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "called 1x"
+        },
+        {
+          "name": "not_used:delete_volume",
+          "category": "tool_selection",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "called 0x"
+        },
+        {
+          "name": "state:config.orders_retry_bounded",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "config.orders_retry_bounded = True (want True)"
+        },
+        {
+          "name": "state:retry_backlog_drained",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "satisfied"
+        },
+        {
+          "name": "state:services.orders.healthy",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 2,
+          "passed": true,
+          "gating": true,
+          "detail": "services.orders.healthy = True (want True)"
+        },
+        {
+          "name": "state:checkout_works",
+          "category": "end_state",
+          "score": 1.0,
+          "weight": 3,
+          "passed": true,
+          "gating": true,
+          "detail": "checkout_works = True (want True)"
+        },
+        {
+          "name": "budget:8",
+          "category": "efficiency",
+          "score": 0.25,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "14 steps (budget 8, limit 16)"
+        },
+        {
+          "name": "no_repeats",
+          "category": "efficiency",
+          "score": 0.8571428571428572,
+          "weight": 1.0,
+          "passed": false,
+          "gating": false,
+          "detail": "2 redundant call(s)"
+        },
+        {
+          "name": "answer:~/retry|unbounded|loop|backlog|queue/",
+          "category": "output",
+          "score": 1.0,
+          "weight": 1.0,
+          "passed": true,
+          "gating": true,
+          "detail": "matched"
+        }
+      ]
+    }
+  ]
+}
