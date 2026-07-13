@@ -19,6 +19,36 @@ from trajeval import Step, Trajectory, from_anthropic, from_openai
 
 ExecuteFn = Callable[[str, Dict[str, Any]], Tuple[Optional[str], Optional[str]]]
 
+
+def _accumulate(usage: Dict[str, int], u: Optional[Dict[str, Any]]) -> None:
+    for k, v in (u or {}).items():
+        if isinstance(v, int):
+            usage[k] = usage.get(k, 0) + v
+
+
+# $/M tokens (input, output); cache reads bill at 10% of input, writes at 125%
+PRICING = {
+    "claude-sonnet-5": (2.0, 10.0),
+    "claude-haiku-4-5": (1.0, 5.0),
+    "claude-opus": (15.0, 75.0),
+    "gpt-4o": (2.5, 10.0),
+}
+
+
+def estimate_cost(model: str, usage: Dict[str, int]) -> Optional[float]:
+    price = next((p for prefix, p in PRICING.items() if model.startswith(prefix)), None)
+    if price is None or not usage:
+        return None
+    p_in, p_out = price
+    if "prompt_tokens" in usage:  # openai
+        return (usage.get("prompt_tokens", 0) * p_in + usage.get("completion_tokens", 0) * p_out) / 1e6
+    return (
+        usage.get("input_tokens", 0) * p_in
+        + usage.get("cache_creation_input_tokens", 0) * p_in * 1.25
+        + usage.get("cache_read_input_tokens", 0) * p_in * 0.10
+        + usage.get("output_tokens", 0) * p_out
+    ) / 1e6
+
 SYSTEM_PROMPT = """You are an on-call SRE agent operating on a small e-commerce platform \
 (gateway -> orders -> payments/inventory, redis behind payments).
 Something is broken. Diagnose the root cause using the tools, fix it with the fewest \
@@ -117,8 +147,10 @@ class AnthropicModel:
         messages: List[Dict[str, Any]] = [{"role": "user", "content": INCIDENT_PROMPT}]
         finished = False
         tool_uses: List[Dict[str, Any]] = []
+        usage: Dict[str, int] = {}
         for _ in range(max_steps + 1):
             resp = self._call(tools, messages)
+            _accumulate(usage, resp.get("usage"))
             messages.append({"role": "assistant", "content": resp["content"]})
             tool_uses = [b for b in resp["content"] if b.get("type") == "tool_use"]
             stop = resp.get("stop_reason")
@@ -152,8 +184,11 @@ class AnthropicModel:
             else:
                 messages.append({"role": "user", "content": WRAP_UP_PROMPT})
             resp = self._call(tools, messages, tool_choice={"type": "none"})
+            _accumulate(usage, resp.get("usage"))
             messages.append({"role": "assistant", "content": resp["content"]})
-        return from_anthropic(messages, scenario=scenario, model=self.model)
+        t = from_anthropic(messages, scenario=scenario, model=self.model)
+        t.metadata["usage"] = usage
+        return t
 
 
 class OpenAIModel:
@@ -187,12 +222,14 @@ class OpenAIModel:
         oa_tools = self._convert_tools(tools)
         finished = False
         tool_calls: List[Dict[str, Any]] = []
+        usage: Dict[str, int] = {}
         for _ in range(max_steps + 1):
             resp = _post_json(
                 "https://api.openai.com/v1/chat/completions",
                 {"Authorization": f"Bearer {self.api_key}"},
                 {"model": self.model, "messages": messages, "tools": oa_tools},
             )
+            _accumulate(usage, resp.get("usage"))
             msg = resp["choices"][0]["message"]
             messages.append(msg)
             tool_calls = msg.get("tool_calls") or []
@@ -216,8 +253,11 @@ class OpenAIModel:
                 {"Authorization": f"Bearer {self.api_key}"},
                 {"model": self.model, "messages": messages, "tools": oa_tools, "tool_choice": "none"},
             )
+            _accumulate(usage, resp.get("usage"))
             messages.append(resp["choices"][0]["message"])
-        return from_openai(messages, scenario=scenario, model=self.model)
+        t = from_openai(messages, scenario=scenario, model=self.model)
+        t.metadata["usage"] = usage
+        return t
 
 
 class FakeModel:

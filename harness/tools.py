@@ -219,7 +219,7 @@ class ToolExecutor:
                     ["docker", "compose", *p[1]],
                     cwd=self.root, capture_output=True, text=True, timeout=60,
                 )
-                text = (out.stdout + out.stderr).strip()[-4000:]
+                text = (out.stdout + out.stderr).strip()[-2000:]
                 if out.returncode != 0:
                     return None, text or f"exit {out.returncode}"
                 return text or "(no output)", None

@@ -24,7 +24,7 @@ from bench.probes import probe_environment
 from bench.rubrics import RUBRICS
 from chaos.failures import FAILURE_MODES
 from chaos.inject import execute as chaos_execute
-from harness.providers import FakeModel, make_model
+from harness.providers import FakeModel, estimate_cost, make_model
 from harness.tools import TOOLS, ToolExecutor
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent
@@ -37,6 +37,7 @@ def run_real(models, scenarios, seeds, max_steps, out_dir):
     out = REPO_ROOT / out_dir
     out.mkdir(exist_ok=True)
     failures = []
+    sweep_cost = 0.0
     for scenario in scenarios:
         mode = FAILURE_MODES[scenario]
         for spec in models:
@@ -54,7 +55,13 @@ def run_real(models, scenarios, seeds, max_steps, out_dir):
                     t.final_state = probe_environment()
                     t.metadata = {"seed": seed, "ended_at": time.time()}
                     s = RUBRICS[scenario].grade(t)
-                    print(f"    total={s.total:.2f} solved={s.passed_all}")
+                    cost = estimate_cost(model.name, t.metadata.get("usage", {}))
+                    cost_note = ""
+                    if cost is not None:
+                        sweep_cost += cost
+                        t.metadata["est_cost_usd"] = round(cost, 4)
+                        cost_note = f" cost≈${cost:.3f}"
+                    print(f"    total={s.total:.2f} solved={s.passed_all}{cost_note}")
                     trajectories.append(t)
                     scores.append(s)
                     board.add(s)
@@ -72,6 +79,8 @@ def run_real(models, scenarios, seeds, max_steps, out_dir):
         print("\nincomplete runs:")
         for f in failures:
             print(f"  - {f}")
+    if sweep_cost:
+        print(f"\nestimated sweep cost: ${sweep_cost:.2f}")
     return trajectories, scores, board
 
 
