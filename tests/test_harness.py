@@ -49,9 +49,21 @@ def test_anthropic_loop_with_mocked_api(monkeypatch):
     assert t.tool_sequence() == ["get_logs"]
     assert t.steps[0].result == "ok"
     assert t.final_answer == "redis was down; fixed."
-    # transcript sanity: tools were sent, system prompt present
-    assert calls[0]["tools"] == list(TOOLS)
-    assert "SRE" in calls[0]["system"]
+    # transcript sanity: tools were sent (last one carries the cache marker),
+    # system prompt present as a cacheable block
+    assert [t["name"] for t in calls[0]["tools"]] == [t["name"] for t in TOOLS]
+    assert calls[0]["tools"][-1]["cache_control"] == {"type": "ephemeral"}
+    assert "SRE" in calls[0]["system"][0]["text"]
+    # never more than 4 cache breakpoints in any request
+    for payload in calls:
+        n = sum(
+            1
+            for m in payload["messages"]
+            if isinstance(m.get("content"), list)
+            for b in m["content"]
+            if isinstance(b, dict) and "cache_control" in b
+        ) + sum(1 for t in payload["tools"] if "cache_control" in t) + 1  # +1 system
+        assert n <= 4, f"{n} cache breakpoints"
 
 
 def test_anthropic_loop_records_tool_errors(monkeypatch):

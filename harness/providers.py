@@ -84,11 +84,25 @@ class AnthropicModel:
         return self.model
 
     def _call(self, tools, messages, tool_choice=None):
+        # prompt caching: the transcript is append-only, so caching the prefix
+        # (tools + system + all but the newest turn) cuts input cost ~90%.
+        # only 4 cache breakpoints are allowed — strip old markers first.
+        for m in messages:
+            if isinstance(m.get("content"), list):
+                for block in m["content"]:
+                    if isinstance(block, dict):
+                        block.pop("cache_control", None)
+        last = messages[-1]
+        if isinstance(last.get("content"), list) and last["content"]:
+            last["content"][-1]["cache_control"] = {"type": "ephemeral"}
+        cached_tools = [dict(t) for t in tools]
+        if cached_tools:
+            cached_tools[-1]["cache_control"] = {"type": "ephemeral"}
         payload = {
             "model": self.model,
             "max_tokens": self.max_tokens,
-            "system": SYSTEM_PROMPT,
-            "tools": list(tools),
+            "system": [{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
+            "tools": cached_tools,
             "messages": messages,
         }
         if tool_choice is not None:
