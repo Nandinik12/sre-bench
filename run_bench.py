@@ -34,27 +34,44 @@ def run_real(models, scenarios, seeds, max_steps, out_dir):
     executor = ToolExecutor()
     trajectories, scores = [], []
     board = Leaderboard()
+    out = REPO_ROOT / out_dir
+    out.mkdir(exist_ok=True)
+    failures = []
     for scenario in scenarios:
         mode = FAILURE_MODES[scenario]
         for spec in models:
             model = make_model(spec)
             for seed in range(seeds):
                 print(f"=== {scenario} / {model.name} / seed {seed}")
-                for m in FAILURE_MODES.values():
-                    chaos_execute(m.restore_steps)
-                time.sleep(3)
-                chaos_execute(mode.break_steps)
-                time.sleep(3)
-                t = model.run(TOOLS, executor.execute, scenario, max_steps)
-                time.sleep(5)  # let async effects settle (e.g. retry backlog draining)
-                t.final_state = probe_environment()
-                t.metadata = {"seed": seed, "ended_at": time.time()}
-                chaos_execute(mode.restore_steps)
-                s = RUBRICS[scenario].grade(t)
-                print(f"    total={s.total:.2f} solved={s.passed_all}")
-                trajectories.append(t)
-                scores.append(s)
-                board.add(s)
+                try:
+                    for m in FAILURE_MODES.values():
+                        chaos_execute(m.restore_steps)
+                    time.sleep(3)
+                    chaos_execute(mode.break_steps)
+                    time.sleep(3)
+                    t = model.run(TOOLS, executor.execute, scenario, max_steps)
+                    time.sleep(5)  # let async effects settle (e.g. retry backlog draining)
+                    t.final_state = probe_environment()
+                    t.metadata = {"seed": seed, "ended_at": time.time()}
+                    s = RUBRICS[scenario].grade(t)
+                    print(f"    total={s.total:.2f} solved={s.passed_all}")
+                    trajectories.append(t)
+                    scores.append(s)
+                    board.add(s)
+                    # incremental save: a crash later never loses finished runs
+                    save_jsonl(trajectories, str(out / "trajectories.jsonl"))
+                    board.save_json(str(out / "board.json"))
+                except KeyboardInterrupt:
+                    raise
+                except Exception as e:
+                    print(f"    RUN FAILED ({type(e).__name__}: {e}) — continuing")
+                    failures.append(f"{scenario}/{model.name}/seed{seed}: {e}")
+                finally:
+                    chaos_execute(mode.restore_steps)
+    if failures:
+        print("\nincomplete runs:")
+        for f in failures:
+            print(f"  - {f}")
     return trajectories, scores, board
 
 

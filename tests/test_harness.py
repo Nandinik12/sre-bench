@@ -123,6 +123,57 @@ def test_make_model_routing(monkeypatch):
         make_model("mystery/model-9000")
 
 
+def test_post_json_retries_timeouts_then_succeeds(monkeypatch):
+    import io
+    import urllib.request
+
+    from harness import providers
+
+    attempts = [0]
+
+    class FakeResp(io.BytesIO):
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    def flaky_urlopen(req, timeout=0):
+        attempts[0] += 1
+        if attempts[0] < 3:
+            raise TimeoutError("read timed out")
+        return FakeResp(b'{"ok": true}')
+
+    monkeypatch.setattr(urllib.request, "urlopen", flaky_urlopen)
+    monkeypatch.setattr(providers.time, "sleep", lambda s: None)
+    out = providers._post_json("https://x", {}, {})
+    assert out == {"ok": True}
+    assert attempts[0] == 3
+
+
+def test_post_json_does_not_retry_bad_request(monkeypatch):
+    import urllib.error
+    import urllib.request
+
+    import pytest
+
+    from harness import providers
+
+    attempts = [0]
+
+    def bad_request(req, timeout=0):
+        attempts[0] += 1
+        raise urllib.error.HTTPError("https://x", 400, "bad request", {}, None)
+
+    monkeypatch.setattr(urllib.request, "urlopen", bad_request)
+    monkeypatch.setattr(providers.time, "sleep", lambda s: None)
+    with pytest.raises(urllib.error.HTTPError):
+        providers._post_json("https://x", {}, {})
+    assert attempts[0] == 1
+
+
 def test_smoke_pipeline_produces_full_leaderboard(tmp_path):
     import run_bench
 
