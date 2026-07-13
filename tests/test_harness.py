@@ -152,6 +152,18 @@ def test_anthropic_exhausted_budget_still_elicits_final_answer(monkeypatch):
     assert last_user["role"] == "user"
     kinds = [b["type"] for b in last_user["content"]]
     assert kinds[0] == "tool_result" and kinds[-1] == "text"
+    # regression: each tool_use id must have exactly ONE tool_result, and
+    # user/assistant roles must strictly alternate (both are API 400s)
+    ids = [
+        b["tool_use_id"]
+        for m in payloads[-1]["messages"]
+        if m["role"] == "user" and isinstance(m["content"], list)
+        for b in m["content"]
+        if b.get("type") == "tool_result"
+    ]
+    assert len(ids) == len(set(ids)), f"duplicate tool_result ids: {ids}"
+    roles = [m["role"] for m in payloads[-1]["messages"]]
+    assert all(a != b for a, b in zip(roles, roles[1:])), f"consecutive roles: {roles}"
 
 
 def test_send_test_checkout_tool_exists_and_posts_to_gateway():

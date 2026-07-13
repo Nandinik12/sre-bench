@@ -125,18 +125,15 @@ class AnthropicModel:
         if not finished:
             # step budget exhausted mid-investigation: elicit the summary so
             # the run is graded on its conclusions, not on truncation.
-            # the dangling tool_use blocks MUST get tool_results first —
-            # the API 400s on a user message that skips them.
-            denied = [
-                {
-                    "type": "tool_result",
-                    "tool_use_id": tu["id"],
-                    "content": "not executed: tool-call limit reached",
-                    "is_error": True,
-                }
-                for tu in tool_uses
-            ]
-            messages.append({"role": "user", "content": denied + [{"type": "text", "text": WRAP_UP_PROMPT}]})
+            # the loop already answered every tool_use, so the transcript ends
+            # with a user message of tool_results — the wrap-up text must be
+            # appended to THAT message (a new user message, or re-sending the
+            # same tool_result ids, both 400).
+            last = messages[-1]
+            if last["role"] == "user" and isinstance(last["content"], list):
+                last["content"] = list(last["content"]) + [{"type": "text", "text": WRAP_UP_PROMPT}]
+            else:
+                messages.append({"role": "user", "content": WRAP_UP_PROMPT})
             resp = self._call(tools, messages, tool_choice={"type": "none"})
             messages.append({"role": "assistant", "content": resp["content"]})
         return from_anthropic(messages, scenario=scenario, model=self.model)
@@ -195,15 +192,7 @@ class OpenAIModel:
                 content = json.dumps({"error": error}) if error is not None else (result or "")
                 messages.append({"role": "tool", "tool_call_id": tc["id"], "content": content})
         if not finished:
-            # answer the dangling tool_calls before the wrap-up user message
-            for tc in tool_calls:
-                messages.append(
-                    {
-                        "role": "tool",
-                        "tool_call_id": tc["id"],
-                        "content": json.dumps({"error": "not executed: tool-call limit reached"}),
-                    }
-                )
+            # the loop already answered every tool_call; just add the wrap-up
             messages.append({"role": "user", "content": WRAP_UP_PROMPT})
             resp = _post_json(
                 "https://api.openai.com/v1/chat/completions",
