@@ -166,6 +166,46 @@ def test_anthropic_exhausted_budget_still_elicits_final_answer(monkeypatch):
     assert all(a != b for a, b in zip(roles, roles[1:])), f"consecutive roles: {roles}"
 
 
+def test_max_tokens_truncation_is_not_a_final_answer(monkeypatch):
+    """stop_reason=max_tokens with no tool calls means the model was cut off
+    mid-thought — the loop must elicit a real summary, not grade the stub."""
+    responses = [
+        {"stop_reason": "max_tokens", "content": [{"type": "text", "text": "Let me check the"}]},
+        {"stop_reason": "end_turn", "content": [{"type": "text", "text": "redis was down."}]},
+    ]
+    n = [0]
+
+    def fake_post(url, headers, payload):
+        n[0] += 1
+        return responses[n[0] - 1]
+
+    monkeypatch.setattr("harness.providers._post_json", fake_post)
+    t = AnthropicModel("claude-test", api_key="k").run(TOOLS, stub_execute, "s", 5)
+    assert t.final_answer == "redis was down."
+    assert n[0] == 2  # wrap-up call happened
+
+
+def test_tool_use_with_max_tokens_stop_is_still_executed(monkeypatch):
+    responses = [
+        {
+            "stop_reason": "max_tokens",
+            "content": [{"type": "tool_use", "id": "t1", "name": "get_logs",
+                         "input": {"service": "payments"}}],
+        },
+        {"stop_reason": "end_turn", "content": [{"type": "text", "text": "done"}]},
+    ]
+    n = [0]
+
+    def fake_post(url, headers, payload):
+        n[0] += 1
+        return responses[n[0] - 1]
+
+    monkeypatch.setattr("harness.providers._post_json", fake_post)
+    t = AnthropicModel("claude-test", api_key="k").run(TOOLS, stub_execute, "s", 5)
+    assert t.tool_sequence() == ["get_logs"]
+    assert t.steps[0].result == "ok"
+
+
 def test_send_test_checkout_tool_exists_and_posts_to_gateway():
     from harness.tools import plan
 

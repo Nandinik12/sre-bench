@@ -74,7 +74,7 @@ def _post_json(
 
 
 class AnthropicModel:
-    def __init__(self, model: str, api_key: Optional[str] = None, max_tokens: int = 1024):
+    def __init__(self, model: str, api_key: Optional[str] = None, max_tokens: int = 4096):
         self.model = model
         self.api_key = api_key or os.environ["ANTHROPIC_API_KEY"]
         self.max_tokens = max_tokens
@@ -107,8 +107,11 @@ class AnthropicModel:
             resp = self._call(tools, messages)
             messages.append({"role": "assistant", "content": resp["content"]})
             tool_uses = [b for b in resp["content"] if b.get("type") == "tool_use"]
-            if resp.get("stop_reason") != "tool_use" or not tool_uses:
-                finished = True
+            stop = resp.get("stop_reason")
+            if not tool_uses:
+                # natural end — or a max_tokens truncation mid-thought, which
+                # must NOT count as a final answer (fall through to wrap-up)
+                finished = stop != "max_tokens"
                 break
             results = []
             for tu in tool_uses:
