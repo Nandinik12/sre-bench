@@ -24,6 +24,14 @@ POISONED_INVENTORY_CONFIG = "max_reserve: 0\nreserve_timeout_ms: 5\n"
 
 INVENTORY_CONFIG_PATH = "services/inventory/config/inventory.yaml"
 
+GOOD_ORDERS_CONFIG = "retry_limit: 3\n"
+UNBOUNDED_ORDERS_CONFIG = "retry_limit: 0\n"
+ORDERS_CONFIG_PATH = "services/orders/config/orders.yaml"
+
+_DOOMED_JOBS = [
+    '{"order_id": "doomed-%d", "amount_cents": -1, "attempts": 0}' % i for i in range(1, 7)
+]
+
 
 @dataclass
 class FailureMode:
@@ -86,4 +94,43 @@ FAILURE_MODES: Dict[str, FailureMode] = {
         break_steps=[("write_file", INVENTORY_CONFIG_PATH, POISONED_INVENTORY_CONFIG)],
         restore_steps=[("write_file", INVENTORY_CONFIG_PATH, GOOD_INVENTORY_CONFIG)],
     ),
+    "runaway-retry": FailureMode(
+        name="runaway-retry",
+        description="orders retry_limit poisoned to 0 (unbounded) + doomed jobs seeded; "
+        "worker retries forever, floods logs, saturates the redis-backed queue",
+        blast_radius="orders 503 backpressure -> checkout fails; restart does NOT help "
+        "(queue persists in redis) — only bounding the retries does",
+        break_steps=[
+            ("write_file", ORDERS_CONFIG_PATH, UNBOUNDED_ORDERS_CONFIG),
+            (
+                "run",
+                ["docker", "compose", "exec", "-T", "redis",
+                 "redis-cli", "lpush", "orders:retry_queue", *_DOOMED_JOBS],
+            ),
+        ],
+        restore_steps=[
+            ("write_file", ORDERS_CONFIG_PATH, GOOD_ORDERS_CONFIG),
+            (
+                "run",
+                ["docker", "compose", "exec", "-T", "redis",
+                 "redis-cli", "del", "orders:retry_queue"],
+            ),
+        ],
+    ),
 }
+
+# two simultaneous faults: fixing one is not enough, checkout stays broken
+# until the agent finds and fixes both
+FAILURE_MODES["compound-outage"] = FailureMode(
+    name="compound-outage",
+    description="redis stopped AND inventory config poisoned at the same time",
+    blast_radius="payments 503 + inventory 503 -> checkout down twice over",
+    break_steps=(
+        list(FAILURE_MODES["poisoned-config"].break_steps)
+        + list(FAILURE_MODES["dead-dependency"].break_steps)
+    ),
+    restore_steps=(
+        list(FAILURE_MODES["dead-dependency"].restore_steps)
+        + list(FAILURE_MODES["poisoned-config"].restore_steps)
+    ),
+)

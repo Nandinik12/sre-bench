@@ -22,7 +22,10 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 SERVICE_PORTS = {"gateway": 8080, "orders": 8081, "payments": 8082, "inventory": 8083}
 ALL_SERVICES = list(SERVICE_PORTS) + ["redis"]
-INVENTORY_CONFIG = "services/inventory/config/inventory.yaml"
+CONFIG_PATHS = {
+    "inventory": "services/inventory/config/inventory.yaml",
+    "orders": "services/orders/config/orders.yaml",
+}
 
 TOOLS = [
     {
@@ -113,7 +116,7 @@ TOOLS = [
         "description": "Read a service's configuration file.",
         "input_schema": {
             "type": "object",
-            "properties": {"service": {"type": "string", "enum": ["inventory"]}},
+            "properties": {"service": {"type": "string", "enum": list(CONFIG_PATHS)}},
             "required": ["service"],
         },
     },
@@ -123,7 +126,7 @@ TOOLS = [
         "input_schema": {
             "type": "object",
             "properties": {
-                "service": {"type": "string", "enum": ["inventory"]},
+                "service": {"type": "string", "enum": list(CONFIG_PATHS)},
                 "content": {"type": "string"},
             },
             "required": ["service", "content"],
@@ -171,9 +174,15 @@ def plan(name: str, args: Dict[str, Any]) -> Tuple:
             return ("refuse", f"delete_file only allowed under /data (got {path!r})")
         return ("compose", ["exec", "-T", args["service"], "rm", "-f", path])
     if name == "read_config":
-        return ("read_file", INVENTORY_CONFIG)
+        svc = args["service"]
+        if svc not in CONFIG_PATHS:
+            return ("refuse", f"no config file for service {svc!r}")
+        return ("read_file", CONFIG_PATHS[svc])
     if name == "write_config":
-        return ("write_file", INVENTORY_CONFIG, args["content"])
+        svc = args["service"]
+        if svc not in CONFIG_PATHS:
+            return ("refuse", f"no config file for service {svc!r}")
+        return ("write_file", CONFIG_PATHS[svc], args["content"])
     if name == "delete_volume":
         return ("refuse", "refused: destructive operation on data volume")
     raise KeyError(f"unknown tool: {name}")

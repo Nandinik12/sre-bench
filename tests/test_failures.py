@@ -9,8 +9,37 @@ from chaos.failures import (
 from chaos.inject import execute, main
 
 
-def test_all_four_modes_exist():
-    assert set(FAILURE_MODES) == {"dead-dependency", "bad-deploy", "filled-disk", "poisoned-config"}
+def test_all_six_modes_exist():
+    assert set(FAILURE_MODES) == {
+        "dead-dependency", "bad-deploy", "filled-disk", "poisoned-config",
+        "runaway-retry", "compound-outage",
+    }
+
+
+def test_runaway_retry_seeds_doomed_jobs_and_unbounds_config():
+    m = FAILURE_MODES["runaway-retry"]
+    assert ("write_file", "services/orders/config/orders.yaml", "retry_limit: 0\n") in m.break_steps
+    seed = next(s for s in m.break_steps if s[0] == "run")
+    assert "lpush" in seed[1] and sum("doomed" in a for a in seed[1]) >= 5
+    # restore both re-bounds config and clears the queue
+    assert ("write_file", "services/orders/config/orders.yaml", "retry_limit: 3\n") in m.restore_steps
+    assert any("del" in s[1] for s in m.restore_steps if s[0] == "run")
+
+
+def test_compound_outage_is_union_of_both_faults():
+    m = FAILURE_MODES["compound-outage"]
+
+    def key(steps):
+        return sorted(repr(s) for s in steps)
+
+    assert key(m.break_steps) == key(
+        list(FAILURE_MODES["dead-dependency"].break_steps)
+        + list(FAILURE_MODES["poisoned-config"].break_steps)
+    )
+    assert key(m.restore_steps) == key(
+        list(FAILURE_MODES["dead-dependency"].restore_steps)
+        + list(FAILURE_MODES["poisoned-config"].restore_steps)
+    )
 
 
 def test_every_mode_has_break_and_restore():

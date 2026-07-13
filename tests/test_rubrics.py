@@ -6,7 +6,7 @@ if a rubric change lets a sloppy trajectory score well, they fail.
 
 from trajeval import Step, Trajectory
 
-from bench.goldens import healthy_state
+from bench.goldens import GOLDEN_SCRIPTS, healthy_state
 from bench.rubrics import RUBRICS
 
 
@@ -20,52 +20,12 @@ def traj(scenario, steps, answer, state=None):
     )
 
 
+# built from the single source of truth in bench/goldens.py
 GOLDEN = {
-    "dead-dependency": traj(
-        "dead-dependency",
-        [
-            Step("check_health", {"service": "payments"}, result="503 redis unreachable"),
-            Step("get_logs", {"service": "payments"}, result="cannot reach redis"),
-            Step("restart_service", {"name": "redis"}, result="ok"),
-            Step("check_health", {"service": "gateway"}, result="ok"),
-        ],
-        "Root cause: redis was stopped. Restarted redis; checkout flow recovered.",
-    ),
-    "bad-deploy": traj(
-        "bad-deploy",
-        [
-            Step("get_logs", {"service": "payments"}, result="KeyError: 'payment_method_id'"),
-            Step("set_deploy", {"service": "payments", "variant": "good"}, result="ok"),
-            Step("check_health", {"service": "payments"}, result="ok v2.1.6"),
-        ],
-        "Bad deploy of payments (v2.1.7): rolled back to the previous version.",
-    ),
-    "filled-disk": traj(
-        "filled-disk",
-        [
-            Step("get_logs", {"service": "inventory"}, result="storage full"),
-            Step("disk_usage", {"service": "inventory", "path": "/data"}, result="100%"),
-            Step("list_files", {"service": "inventory", "path": "/data"}, result="core.20260712.dump"),
-            Step("delete_file", {"service": "inventory", "path": "/data/core.20260712.dump"}, result="ok"),
-            Step("check_health", {"service": "inventory"}, result="ok"),
-        ],
-        "Disk was full: a core dump filled /data. Deleted it; inventory recovered.",
-    ),
-    "poisoned-config": traj(
-        "poisoned-config",
-        [
-            Step("get_logs", {"service": "inventory"}, result="invalid max_reserve: 0"),
-            Step("read_config", {"service": "inventory"}, result="max_reserve: 0"),
-            Step(
-                "write_config",
-                {"service": "inventory", "content": "max_reserve: 100\nreserve_timeout_ms: 2000\n"},
-                result="ok",
-            ),
-            Step("check_health", {"service": "inventory"}, result="ok"),
-        ],
-        "Config was poisoned (max_reserve 0, 5ms timeout). Restored valid values.",
-    ),
+    scenario: traj(scenario, [Step(tool, args, result="ok") for tool, args in script], answer)
+    for scenario, (script, answer) in GOLDEN_SCRIPTS.items()
 }
+
 
 
 def test_golden_runs_score_perfect():
@@ -129,6 +89,49 @@ def test_slow_but_correct_run_still_counts_as_solved():
     score = RUBRICS["dead-dependency"].grade(t)
     assert score.total < 1.0
     assert score.passed_all
+
+
+def test_runaway_retry_restart_does_not_count_as_fix():
+    """The classic wrong move: restart orders. Queue persists in redis,
+    config still unbounded — end state stays broken."""
+    state = healthy_state()
+    state["config"]["orders_retry_bounded"] = False
+    state["orders_retry_queue"] = 6
+    state["services"]["orders"]["healthy"] = False
+    state["checkout_works"] = False
+    t = traj(
+        "runaway-retry",
+        [
+            Step("get_logs", {"service": "orders"}, result="retrying doomed-1 (UNBOUNDED)"),
+            Step("restart_service", {"name": "orders"}, result="ok"),
+            Step("restart_service", {"name": "orders"}, result="ok"),
+        ],
+        "Restarted orders, should recover.",
+        state=state,
+    )
+    score = RUBRICS["runaway-retry"].grade(t)
+    assert score.total < 0.3
+    assert not score.passed_all
+
+
+def test_compound_outage_fixing_only_one_fault_is_not_solved():
+    state = healthy_state()
+    state["config"]["inventory_valid"] = False  # config fault never fixed
+    state["services"]["inventory"]["healthy"] = False
+    state["checkout_works"] = False
+    t = traj(
+        "compound-outage",
+        [
+            Step("get_logs", {"service": "payments"}, result="redis down"),
+            Step("restart_service", {"name": "redis"}, result="ok"),
+            Step("check_health", {"service": "payments"}, result="ok"),
+        ],
+        "redis was down, restarted it.",
+        state=state,
+    )
+    score = RUBRICS["compound-outage"].grade(t)
+    assert not score.passed_all
+    assert score.total < 0.6
 
 
 def test_invalid_yaml_write_gets_no_argument_credit():

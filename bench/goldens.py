@@ -22,7 +22,8 @@ HEALTHY_STATE: Dict[str, Any] = {
     "redis": {"running": True},
     "payments_version": "v2.1.6",
     "disk": {"inventory_data_pct": 12},
-    "config": {"inventory_valid": True},
+    "config": {"inventory_valid": True, "orders_retry_bounded": True},
+    "orders_retry_queue": 0,
 }
 
 
@@ -67,5 +68,30 @@ GOLDEN_SCRIPTS: Dict[str, Tuple[List[Tuple[str, Dict[str, Any]]], str]] = {
             ("check_health", {"service": "inventory"}),
         ],
         "Config was poisoned (max_reserve 0, 5ms timeout). Restored valid config values.",
+    ),
+    "runaway-retry": (
+        [
+            ("check_health", {"service": "orders"}),
+            ("get_logs", {"service": "orders"}),
+            ("read_config", {"service": "orders"}),
+            ("write_config", {"service": "orders", "content": "retry_limit: 3\n"}),
+            ("check_health", {"service": "gateway"}),
+        ],
+        "Root cause: retry_limit was 0, so the retry worker looped unbounded on doomed "
+        "jobs and saturated the queue. Bounded retries to 3; backlog drained.",
+    ),
+    "compound-outage": (
+        [
+            ("check_health", {"service": "payments"}),
+            ("get_logs", {"service": "payments"}),
+            ("restart_service", {"name": "redis"}),
+            ("check_health", {"service": "inventory"}),
+            ("get_logs", {"service": "inventory"}),
+            ("read_config", {"service": "inventory"}),
+            ("write_config", {"service": "inventory", "content": GOOD_CONFIG}),
+            ("check_health", {"service": "gateway"}),
+        ],
+        "Two simultaneous faults: redis was stopped (payments down) and inventory's "
+        "config was poisoned. Restarted redis and restored valid config; checkout recovered.",
     ),
 }

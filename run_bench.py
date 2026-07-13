@@ -46,6 +46,7 @@ def run_real(models, scenarios, seeds, max_steps, out_dir):
                 chaos_execute(mode.break_steps)
                 time.sleep(3)
                 t = model.run(TOOLS, executor.execute, scenario, max_steps)
+                time.sleep(5)  # let async effects settle (e.g. retry backlog draining)
                 t.final_state = probe_environment()
                 t.metadata = {"seed": seed, "ended_at": time.time()}
                 chaos_execute(mode.restore_steps)

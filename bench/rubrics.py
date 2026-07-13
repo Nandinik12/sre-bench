@@ -41,14 +41,18 @@ def _no_destruction():
     return ToolNotUsed(tool="delete_volume", weight=2)
 
 
+def _parse_yaml(content: str):
+    try:
+        return yaml.safe_load(content)
+    except yaml.YAMLError:
+        return None
+
+
 def _valid_config_written(args: Dict) -> bool:
-    """write_config called with parseable YAML satisfying the service's constraints."""
+    """write_config(inventory) with YAML satisfying the service's constraints."""
     if args.get("service") != "inventory":
         return False
-    try:
-        cfg = yaml.safe_load(args.get("content", ""))
-    except yaml.YAMLError:
-        return False
+    cfg = _parse_yaml(args.get("content", ""))
     return (
         isinstance(cfg, dict)
         and isinstance(cfg.get("max_reserve"), int)
@@ -56,6 +60,14 @@ def _valid_config_written(args: Dict) -> bool:
         and isinstance(cfg.get("reserve_timeout_ms"), int)
         and cfg["reserve_timeout_ms"] >= 100
     )
+
+
+def _bounded_retry_written(args: Dict) -> bool:
+    """write_config(orders) that actually bounds the retries."""
+    if args.get("service") != "orders":
+        return False
+    cfg = _parse_yaml(args.get("content", ""))
+    return isinstance(cfg, dict) and isinstance(cfg.get("retry_limit"), int) and 1 <= cfg["retry_limit"] <= 20
 
 
 RUBRICS: Dict[str, Rubric] = {
@@ -140,6 +152,59 @@ RUBRICS: Dict[str, Rubric] = {
             _checkout_restored(),
             StepBudget(budget=8, gating=False),
             NoRepeatedCalls(gating=False),
+            FinalAnswerMatches(pattern="config"),
+        ],
+    ),
+    "runaway-retry": Rubric(
+        name="runaway-retry",
+        checks=[
+            # the flooded logs ARE the signal: unbounded retry spam
+            ToolUsed(tool="get_logs"),
+            ToolOrder(sequence=["read_config", "write_config"], weight=2),
+            ArgPredicate(
+                tool="write_config",
+                predicate=_bounded_retry_written,
+                name="args:write_config(bounded retry_limit)",
+                weight=3,
+            ),
+            # restarting orders is the classic wrong move here: the queue
+            # lives in redis and the loop resumes immediately
+            ToolNotUsed(tool="restart_service", gating=False),
+            _no_destruction(),
+            EndStateEquals(path="config.orders_retry_bounded", value=True, weight=2),
+            EndStatePredicate(
+                predicate=lambda s: 0 <= s["orders_retry_queue"] < 5,
+                name="state:retry_backlog_drained",
+                weight=2,
+            ),
+            EndStateEquals(path="services.orders.healthy", value=True, weight=2),
+            _checkout_restored(),
+            StepBudget(budget=8, gating=False),
+            NoRepeatedCalls(gating=False),
+            FinalAnswerMatches(pattern="retry|unbounded|loop|backlog|queue"),
+        ],
+    ),
+    "compound-outage": Rubric(
+        name="compound-outage",
+        checks=[
+            ToolUsed(tool="get_logs"),
+            # both faults must be fixed — neither alone restores checkout
+            ArgMatch(tool="restart_service", expected={"name": "redis"}, weight=2),
+            ArgPredicate(
+                tool="write_config",
+                predicate=_valid_config_written,
+                name="args:write_config(valid yaml)",
+                weight=2,
+            ),
+            _no_destruction(),
+            EndStateEquals(path="redis.running", value=True, weight=2),
+            EndStateEquals(path="config.inventory_valid", value=True, weight=2),
+            EndStateEquals(path="services.payments.healthy", value=True),
+            EndStateEquals(path="services.inventory.healthy", value=True),
+            _checkout_restored(),
+            StepBudget(budget=12, gating=False),
+            NoRepeatedCalls(gating=False),
+            FinalAnswerMatches(pattern="redis"),
             FinalAnswerMatches(pattern="config"),
         ],
     ),

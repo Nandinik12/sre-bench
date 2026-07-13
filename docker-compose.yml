@@ -35,9 +35,13 @@ services:
     environment:
       - PAYMENTS_URL=http://payments:8000
       - INVENTORY_URL=http://inventory:8000
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./services/orders/config:/config
     depends_on:
       - payments
       - inventory
+      - redis
     ports:
       - "8081:8000"
 

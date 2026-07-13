@@ -131,7 +131,7 @@ def test_smoke_pipeline_produces_full_leaderboard(tmp_path):
     out = tmp_path / "runs"
     board = json.loads((out / "board.json").read_text())
     assert board["rows"][0]["overall"] == 1.0
-    assert board["rows"][0]["solved"] == 4
+    assert board["rows"][0]["solved"] == len(board["scenarios"])
     assert (out / "leaderboard.md").read_text().count("fake/golden") == 1
     lines = (out / "trajectories.jsonl").read_text().strip().splitlines()
-    assert len(lines) == 4
+    assert len(lines) == len(board["scenarios"])

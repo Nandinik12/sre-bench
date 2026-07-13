@@ -18,6 +18,7 @@ import yaml
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 INVENTORY_CONFIG = REPO_ROOT / "services" / "inventory" / "config" / "inventory.yaml"
+ORDERS_CONFIG = REPO_ROOT / "services" / "orders" / "config" / "orders.yaml"
 
 SERVICES = {
     "gateway": 8080,
@@ -100,6 +101,27 @@ def _inventory_config_valid() -> bool:
         return False
 
 
+def _orders_retry_bounded() -> bool:
+    try:
+        cfg = yaml.safe_load(ORDERS_CONFIG.read_text())
+        return isinstance(cfg, dict) and isinstance(cfg.get("retry_limit"), int) and cfg["retry_limit"] >= 1
+    except Exception:
+        return False
+
+
+def _retry_queue_len() -> int:
+    """Length of the orders retry queue in redis. -1 if unknown."""
+    try:
+        out = subprocess.run(
+            ["docker", "compose", "exec", "-T", "redis",
+             "redis-cli", "llen", "orders:retry_queue"],
+            capture_output=True, text=True, timeout=10, cwd=REPO_ROOT,
+        )
+        return int(out.stdout.strip())
+    except Exception:
+        return -1
+
+
 def probe_environment(host: str = "localhost") -> Dict[str, Any]:
     services = {name: _http_health(port, host) for name, port in SERVICES.items()}
     return {
@@ -108,5 +130,9 @@ def probe_environment(host: str = "localhost") -> Dict[str, Any]:
         "redis": _redis_running(),
         "payments_version": _payments_version(host),
         "disk": {"inventory_data_pct": _inventory_disk_pct()},
-        "config": {"inventory_valid": _inventory_config_valid()},
+        "config": {
+            "inventory_valid": _inventory_config_valid(),
+            "orders_retry_bounded": _orders_retry_bounded(),
+        },
+        "orders_retry_queue": _retry_queue_len(),
     }

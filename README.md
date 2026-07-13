@@ -18,6 +18,8 @@ The business flow: `POST /checkout` → reserve inventory → charge payment. Ev
 | `bad-deploy` | payments redeployed broken | /charge 500s but **/health is green** — only the logs (KeyError) tell the story | roll payments back to `good` |
 | `filled-disk` | core dump fills inventory's /data | reserve 507, health 503 | find and delete the dump — **not** `reservations.log`, and a restart only hides it |
 | `poisoned-config` | inventory.yaml gets invalid values | reserve 500, health 503 | read config, write valid values back |
+| `runaway-retry` | orders' retry_limit set to 0 + doomed jobs seeded | worker retries forever, floods logs, queue saturates → orders 503 backpressure | bound the retries in config — **restarting doesn't help**, the queue lives in redis |
+| `compound-outage` | redis stopped **and** config poisoned simultaneously | checkout down twice over | fix both faults; fixing one leaves checkout broken |
 
 Each scenario has traps that separate diagnosis from flailing: restarting the symptomatic service, deleting real data, or "fixing" health without fixing the root cause all lose points on specific checks.
 

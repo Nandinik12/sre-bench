@@ -51,6 +51,9 @@ def version():
 
 @app.post("/charge")
 def charge(c: Charge):
+    if c.amount_cents <= 0:
+        log.warning("rejected charge for order %s: invalid amount %s", c.order_id, c.amount_cents)
+        raise HTTPException(400, detail=f"invalid amount_cents: {c.amount_cents}")
     if BROKEN:
         # simulate a bad deploy: new code path assumes a field that isn't set
         log.error("charge failed for order %s", c.order_id)
