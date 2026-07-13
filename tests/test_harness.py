@@ -126,10 +126,12 @@ def test_make_model_routing(monkeypatch):
 def test_anthropic_exhausted_budget_still_elicits_final_answer(monkeypatch):
     """When the step limit is hit, the loop must ask for a summary with
     tool_choice=none so runs are graded on conclusions, not truncation."""
+    import copy
+
     payloads = []
 
     def fake_post(url, headers, payload):
-        payloads.append(payload)
+        payloads.append(copy.deepcopy(payload))
         if payload.get("tool_choice") == {"type": "none"}:
             return {"stop_reason": "end_turn",
                     "content": [{"type": "text", "text": "hypothesis: bad deploy of payments"}]}
