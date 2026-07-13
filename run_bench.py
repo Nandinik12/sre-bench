@@ -59,7 +59,7 @@ def run_real(models, scenarios, seeds, max_steps, out_dir, prior=()):
                     t = model.run(TOOLS, executor.execute, scenario, max_steps)
                     time.sleep(5)  # let async effects settle (e.g. retry backlog draining)
                     t.final_state = probe_environment()
-                    t.metadata = {"seed": seed, "ended_at": time.time()}
+                    t.metadata.update({"seed": seed, "ended_at": time.time()})
                     s = RUBRICS[scenario].grade(t)
                     cost = estimate_cost(model.name, t.metadata.get("usage", {}))
                     cost_note = ""

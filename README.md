@@ -8,12 +8,14 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | claude-sonnet-5 | 0.94 | 6/6 | 0.97 | 1.00 | 1.00 | 0.49 | 1.00 |
 | 2 | claude-haiku-4-5 | 0.91 | 4/6 | 0.94 | 0.94 | 0.94 | 0.57 | 1.00 |
+| 3 | claude-fable-5 | 0.91 | 4/6 | 0.96 | 0.89 | 0.91 | 0.79 | 0.89 |
 
 Findings from this run (raw trajectories in `results/2026-07-13/`):
 
-- **Reliability, not capability, separates the tiers.** Haiku matches Sonnet's scores when it succeeds — it just fails seeds Sonnet doesn't. On `runaway-retry` it fell into the designed trap: restarted the symptomatic service twice, misdiagnosed the doomed retry jobs as a bad payments deploy, and wrote a confident incident summary naming the wrong root cause. The end-state probes caught it (0.24).
-- **Nobody is efficient.** Both models solve incidents at ~2x the step budget of the golden trajectory. Efficiency is scored but non-gating — a slow fix is still a fix.
-- **The environment is honest.** Every number above is reproducible: break the environment yourself, run your own agent, grade it with the same rubrics.
+- **The frontier model doesn't top the board.** Fable 5 is by far the most step-efficient (0.79 vs Sonnet's 0.49) but dropped two seeds. On `filled-disk` it stopped investigating after two tool calls, claiming a test checkout had passed while the disk sat at 100%; on `poisoned-config` it rewrote the config but never verified the fix or delivered an incident summary. Fast and decisive cuts both ways.
+- **Each tier fails differently.** Haiku's failures are *misdiagnosis*: on `runaway-retry` it restarted the symptomatic service twice, blamed a payments deploy, and wrote a confident summary naming the wrong root cause. Fable's failures are *early termination*: superficially plausible signals end the investigation. Sonnet fails neither way — it just takes twice the steps.
+- **End-state probes are what catch all of this.** Every failure above was a confident agent contradicted by the environment. Grading the world, not the model's claims, is the entire design.
+- **Every number is reproducible.** Break the environment yourself, run your own agent, grade it with the same rubrics.
 
 Breakable infrastructure for benchmarking SRE agents. Four dockerized microservices, a chaos injector that induces realistic failures, and per-scenario rubrics graded by [trajeval](../trajeval) — tool selection, argument correctness, and end state, verified by probing the environment (never by trusting the agent's claims).
 
