@@ -123,6 +123,37 @@ def test_make_model_routing(monkeypatch):
         make_model("mystery/model-9000")
 
 
+def test_anthropic_exhausted_budget_still_elicits_final_answer(monkeypatch):
+    """When the step limit is hit, the loop must ask for a summary with
+    tool_choice=none so runs are graded on conclusions, not truncation."""
+    payloads = []
+
+    def fake_post(url, headers, payload):
+        payloads.append(payload)
+        if payload.get("tool_choice") == {"type": "none"}:
+            return {"stop_reason": "end_turn",
+                    "content": [{"type": "text", "text": "hypothesis: bad deploy of payments"}]}
+        return {
+            "stop_reason": "tool_use",
+            "content": [{"type": "tool_use", "id": f"t{len(payloads)}",
+                         "name": "get_logs", "input": {"service": "payments"}}],
+        }
+
+    monkeypatch.setattr("harness.providers._post_json", fake_post)
+    t = AnthropicModel("claude-test", api_key="k").run(TOOLS, stub_execute, "bad-deploy", max_steps=3)
+    assert t.final_answer == "hypothesis: bad deploy of payments"
+    assert payloads[-1]["tool_choice"] == {"type": "none"}
+    assert len(t.steps) == 4  # max_steps + 1 loop iterations, all tool calls
+
+
+def test_send_test_checkout_tool_exists_and_posts_to_gateway():
+    from harness.tools import plan
+
+    p = plan("send_test_checkout", {})
+    assert p[0] == "http_post" and ":8080/checkout" in p[1]
+    assert p[2]["sku"] == "synthetic-test"
+
+
 def test_post_json_retries_timeouts_then_succeeds(monkeypatch):
     import io
     import urllib.request

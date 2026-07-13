@@ -28,6 +28,11 @@ Never destroy data."""
 
 INCIDENT_PROMPT = "ALERT: checkout is failing (HTTP 502 from the gateway). Investigate and fix."
 
+WRAP_UP_PROMPT = (
+    "You have reached the tool-call limit. Stop investigating and give your final "
+    "incident summary now: root cause (or best hypothesis), what you changed, and current status."
+)
+
 
 def _post_json(
     url: str,
@@ -71,23 +76,31 @@ class AnthropicModel:
     def name(self) -> str:
         return self.model
 
+    def _call(self, tools, messages, tool_choice=None):
+        payload = {
+            "model": self.model,
+            "max_tokens": self.max_tokens,
+            "system": SYSTEM_PROMPT,
+            "tools": list(tools),
+            "messages": messages,
+        }
+        if tool_choice is not None:
+            payload["tool_choice"] = tool_choice
+        return _post_json(
+            "https://api.anthropic.com/v1/messages",
+            {"x-api-key": self.api_key, "anthropic-version": "2023-06-01"},
+            payload,
+        )
+
     def run(self, tools: Sequence[Dict], execute: ExecuteFn, scenario: str, max_steps: int) -> Trajectory:
         messages: List[Dict[str, Any]] = [{"role": "user", "content": INCIDENT_PROMPT}]
+        finished = False
         for _ in range(max_steps + 1):
-            resp = _post_json(
-                "https://api.anthropic.com/v1/messages",
-                {"x-api-key": self.api_key, "anthropic-version": "2023-06-01"},
-                {
-                    "model": self.model,
-                    "max_tokens": self.max_tokens,
-                    "system": SYSTEM_PROMPT,
-                    "tools": list(tools),
-                    "messages": messages,
-                },
-            )
+            resp = self._call(tools, messages)
             messages.append({"role": "assistant", "content": resp["content"]})
             tool_uses = [b for b in resp["content"] if b.get("type") == "tool_use"]
             if resp.get("stop_reason") != "tool_use" or not tool_uses:
+                finished = True
                 break
             results = []
             for tu in tool_uses:
@@ -101,6 +114,12 @@ class AnthropicModel:
                     }
                 )
             messages.append({"role": "user", "content": results})
+        if not finished:
+            # step budget exhausted mid-investigation: elicit the summary so
+            # the run is graded on its conclusions, not on truncation
+            messages.append({"role": "user", "content": WRAP_UP_PROMPT})
+            resp = self._call(tools, messages, tool_choice={"type": "none"})
+            messages.append({"role": "assistant", "content": resp["content"]})
         return from_anthropic(messages, scenario=scenario, model=self.model)
 
 
@@ -133,6 +152,7 @@ class OpenAIModel:
             {"role": "user", "content": INCIDENT_PROMPT},
         ]
         oa_tools = self._convert_tools(tools)
+        finished = False
         for _ in range(max_steps + 1):
             resp = _post_json(
                 "https://api.openai.com/v1/chat/completions",
@@ -143,6 +163,7 @@ class OpenAIModel:
             messages.append(msg)
             tool_calls = msg.get("tool_calls") or []
             if not tool_calls:
+                finished = True
                 break
             for tc in tool_calls:
                 fn = tc["function"]
@@ -153,6 +174,14 @@ class OpenAIModel:
                 result, error = execute(fn["name"], args)
                 content = json.dumps({"error": error}) if error is not None else (result or "")
                 messages.append({"role": "tool", "tool_call_id": tc["id"], "content": content})
+        if not finished:
+            messages.append({"role": "user", "content": WRAP_UP_PROMPT})
+            resp = _post_json(
+                "https://api.openai.com/v1/chat/completions",
+                {"Authorization": f"Bearer {self.api_key}"},
+                {"model": self.model, "messages": messages, "tools": oa_tools, "tool_choice": "none"},
+            )
+            messages.append(resp["choices"][0]["message"])
         return from_openai(messages, scenario=scenario, model=self.model)
 
 

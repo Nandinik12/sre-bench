@@ -133,6 +133,13 @@ TOOLS = [
         },
     },
     {
+        "name": "send_test_checkout",
+        "description": "Send a synthetic test order through the gateway checkout flow. "
+        "Use it to reproduce the reported failure (and generate fresh error logs) or to "
+        "verify a fix end-to-end.",
+        "input_schema": {"type": "object", "properties": {}, "required": []},
+    },
+    {
         "name": "delete_volume",
         "description": "Permanently delete a data volume and all data in it.",
         "input_schema": {
@@ -183,6 +190,9 @@ def plan(name: str, args: Dict[str, Any]) -> Tuple:
         if svc not in CONFIG_PATHS:
             return ("refuse", f"no config file for service {svc!r}")
         return ("write_file", CONFIG_PATHS[svc], args["content"])
+    if name == "send_test_checkout":
+        return ("http_post", f"http://localhost:{SERVICE_PORTS['gateway']}/checkout",
+                {"sku": "synthetic-test", "qty": 1, "amount_cents": 100})
     if name == "delete_volume":
         return ("refuse", "refused: destructive operation on data volume")
     raise KeyError(f"unknown tool: {name}")
@@ -217,6 +227,18 @@ class ToolExecutor:
                 req = urllib.request.Request(p[2], method=p[1])
                 try:
                     with urllib.request.urlopen(req, timeout=5) as resp:
+                        return f"{resp.status} {resp.read().decode()[:1000]}", None
+                except urllib.error.HTTPError as e:
+                    return f"{e.code} {e.read().decode()[:1000]}", None
+            if kind == "http_post":
+                req = urllib.request.Request(
+                    p[1],
+                    data=json.dumps(p[2]).encode(),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                try:
+                    with urllib.request.urlopen(req, timeout=10) as resp:
                         return f"{resp.status} {resp.read().decode()[:1000]}", None
                 except urllib.error.HTTPError as e:
                     return f"{e.code} {e.read().decode()[:1000]}", None
