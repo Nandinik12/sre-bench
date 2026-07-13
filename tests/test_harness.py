@@ -144,6 +144,12 @@ def test_anthropic_exhausted_budget_still_elicits_final_answer(monkeypatch):
     assert t.final_answer == "hypothesis: bad deploy of payments"
     assert payloads[-1]["tool_choice"] == {"type": "none"}
     assert len(t.steps) == 4  # max_steps + 1 loop iterations, all tool calls
+    # the API 400s if dangling tool_use blocks aren't answered before the
+    # wrap-up prompt: last user message must lead with their tool_results
+    last_user = payloads[-1]["messages"][-1]
+    assert last_user["role"] == "user"
+    kinds = [b["type"] for b in last_user["content"]]
+    assert kinds[0] == "tool_result" and kinds[-1] == "text"
 
 
 def test_send_test_checkout_tool_exists_and_posts_to_gateway():

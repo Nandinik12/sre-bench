@@ -56,7 +56,14 @@ def _post_json(
             if e.code == 429 or e.code >= 500:
                 last_err = e
             else:
-                raise  # real 4xx: bad request/key — retrying won't help
+                # real 4xx: bad request/key — retrying won't help.
+                # attach the response body: it names the offending field.
+                body = ""
+                try:
+                    body = e.read().decode()[:500]
+                except Exception:
+                    pass
+                raise urllib.error.HTTPError(e.url, e.code, f"{e.reason} — {body}", e.headers, None)
         except (TimeoutError, urllib.error.URLError, ConnectionError, OSError) as e:
             last_err = e
         if attempt < retries:
@@ -95,6 +102,7 @@ class AnthropicModel:
     def run(self, tools: Sequence[Dict], execute: ExecuteFn, scenario: str, max_steps: int) -> Trajectory:
         messages: List[Dict[str, Any]] = [{"role": "user", "content": INCIDENT_PROMPT}]
         finished = False
+        tool_uses: List[Dict[str, Any]] = []
         for _ in range(max_steps + 1):
             resp = self._call(tools, messages)
             messages.append({"role": "assistant", "content": resp["content"]})
@@ -116,8 +124,19 @@ class AnthropicModel:
             messages.append({"role": "user", "content": results})
         if not finished:
             # step budget exhausted mid-investigation: elicit the summary so
-            # the run is graded on its conclusions, not on truncation
-            messages.append({"role": "user", "content": WRAP_UP_PROMPT})
+            # the run is graded on its conclusions, not on truncation.
+            # the dangling tool_use blocks MUST get tool_results first —
+            # the API 400s on a user message that skips them.
+            denied = [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tu["id"],
+                    "content": "not executed: tool-call limit reached",
+                    "is_error": True,
+                }
+                for tu in tool_uses
+            ]
+            messages.append({"role": "user", "content": denied + [{"type": "text", "text": WRAP_UP_PROMPT}]})
             resp = self._call(tools, messages, tool_choice={"type": "none"})
             messages.append({"role": "assistant", "content": resp["content"]})
         return from_anthropic(messages, scenario=scenario, model=self.model)
@@ -153,6 +172,7 @@ class OpenAIModel:
         ]
         oa_tools = self._convert_tools(tools)
         finished = False
+        tool_calls: List[Dict[str, Any]] = []
         for _ in range(max_steps + 1):
             resp = _post_json(
                 "https://api.openai.com/v1/chat/completions",
@@ -175,6 +195,15 @@ class OpenAIModel:
                 content = json.dumps({"error": error}) if error is not None else (result or "")
                 messages.append({"role": "tool", "tool_call_id": tc["id"], "content": content})
         if not finished:
+            # answer the dangling tool_calls before the wrap-up user message
+            for tc in tool_calls:
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc["id"],
+                        "content": json.dumps({"error": "not executed: tool-call limit reached"}),
+                    }
+                )
             messages.append({"role": "user", "content": WRAP_UP_PROMPT})
             resp = _post_json(
                 "https://api.openai.com/v1/chat/completions",
